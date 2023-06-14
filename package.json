@@ -1,8 +1,8 @@
 {
-	"name": "breadcrumbs",
+	"name": "panko",
 	"type": "module",
-	"version": "0.0.0",
-	"description": "",
+	"version": "0.1.0",
+	"description": "A browser extension for keeping track where that tab came from",
 	"scripts": {
 		"start": "vite",
 		"dev": "vite",
