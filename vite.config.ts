@@ -7,7 +7,13 @@ const { version } = packageJson;
 const manifest = defineManifest(async (env) => ({
 	manifest_version: 3,
 	version,
-	name: env.mode === "staging" ? "[DEV] Breadcrumbs" : "Breadcrumbs",
+	icons: {
+		16: "src/assets/icon16.png",
+		32: "src/assets/icon32.png",
+		48: "src/assets/icon48.png",
+		128: "src/assets/icon128.png",
+	},
+	name: env.mode === "dev" ? "[DEV] Breadcrumbs" : "Breadcrumbs",
 	action: {
 		default_popup: "index.html",
 		default_title: "Breadcrumbs",
