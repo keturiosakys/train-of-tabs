@@ -6,6 +6,7 @@ const { version } = packageJson;
 
 const manifest = defineManifest(async (env) => ({
 	manifest_version: 3,
+	description: "An extension to keep track of where that tab came from.",
 	version,
 	icons: {
 		16: "src/assets/icon16.png",
@@ -13,10 +14,10 @@ const manifest = defineManifest(async (env) => ({
 		48: "src/assets/icon48.png",
 		128: "src/assets/icon128.png",
 	},
-	name: env.mode === "dev" ? "[DEV] Breadcrumbs" : "Breadcrumbs",
+	name: env.mode === "development" ? "[DEV] Panko" : "Panko",
 	action: {
 		default_popup: "index.html",
-		default_title: "Breadcrumbs",
+		default_title: "Panko",
 	},
 	background: {
 		type: "module",

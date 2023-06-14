@@ -19,7 +19,7 @@ function createTabNode(tab: chrome.tabs.Tab): TabNode | undefined {
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-	console.log("Breadcrumbs extension installed");
+	console.log("Panko extension installed. Crushing bread now...");
 });
 
 chrome.tabs.onCreated.addListener(async (tab) => {

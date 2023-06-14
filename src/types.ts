@@ -6,4 +6,3 @@ export interface TabNode {
 	children?: TabNode[];
 	status: "open" | "closed";
 }
-
