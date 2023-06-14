@@ -1,7 +1,3 @@
-export type Message = {
-	type: "getTabNode" | "getTabTree";
-};
-
 export interface TabNode {
 	tabId: number;
 	title: string;

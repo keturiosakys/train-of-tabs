@@ -1,17 +1,33 @@
-import { Message, TabNode } from "./types";
+import { TabNode } from "./types";
+import { mapToObject } from "./utils";
 
-export const tabTree: TabNode[] = [];
+export const tabTree: Map<number, TabNode> = new Map();
+
+function createTabNode(tab: chrome.tabs.Tab): TabNode | undefined {
+	if (!tab.id) {
+		return undefined;
+	}
+
+	return {
+		tabId: tab.id,
+		url: tab.url || "",
+		title: tab.title || "",
+		originTabId: tab.openerTabId,
+		status: "open",
+		children: [],
+	};
+}
 
 chrome.runtime.onInstalled.addListener(() => {
 	console.log("Breadcrumbs extension installed");
 });
 
-chrome.tabs.onCreated.addListener((tab) => {
+chrome.tabs.onCreated.addListener(async (tab) => {
 	if (!tab.id) {
 		return; // no id no fun
 	}
 
-	const tabNode: TabNode = {
+	const createdTabNode: TabNode = {
 		tabId: tab.id,
 		url: tab.url || "",
 		title: tab.title || "",
@@ -19,47 +35,46 @@ chrome.tabs.onCreated.addListener((tab) => {
 		status: "open",
 	};
 
-	const originTabNode = tabTree.find((node) => node.tabId === tab.openerTabId);
+	tabTree.set(tab.id, createdTabNode);
 
-	if (originTabNode) {
+	if (tab.openerTabId) {
+		const originTabNode =
+			tabTree.get(tab.openerTabId) ??
+			(createTabNode(await chrome.tabs.get(tab.openerTabId)) as TabNode);
+
 		if (!originTabNode.children) {
 			originTabNode.children = [];
 		}
 
-		originTabNode.children.push(tabNode);
+		originTabNode.children.push(createdTabNode);
+		tabTree.set(tab.openerTabId, originTabNode);
 	}
 
-	console.log("Tab created", tabNode);
-
-	tabTree.push(tabNode);
-	chrome.storage.local.set({ tabTree });
+	chrome.storage.session.set({ tabTree: mapToObject(tabTree) });
 });
 
+chrome.tabs.onUpdated.addListener(async (tabId, _changeInfo, tab) => {
+	const tabNode = tabTree.get(tabId);
+
+	if (tabNode) {
+		tabNode.url = tab.url || "";
+		tabNode.title = tab.title || "";
+		tabNode.originTabId = tab.openerTabId;
+		tabTree.set(tabId, tabNode);
+	}
+
+	chrome.storage.session.set({ tabTree: mapToObject(tabTree) });
+});
+
+//chrome.tabs.onUpdated.addListener(async (_tabId, changeInfo) => {
+//});
+
 chrome.tabs.onRemoved.addListener((tabId) => {
-	const tabNode = tabTree.find((node) => node.tabId === tabId);
+	const tabNode = tabTree.get(tabId);
 
 	if (tabNode) {
 		tabNode.status = "closed";
+		tabTree.set(tabId, tabNode);
+		chrome.storage.session.set({ tabTree: mapToObject(tabTree) });
 	}
-	console.log("Tab removed", tabNode);
 });
-
-chrome.runtime.onMessage.addListener(
-	(message: Message, sender, sendResponse) => {
-		console.log("Message received", message);
-		console.log("Sender", sender);
-		console.log(tabTree);
-		if (!sender?.tab?.id) {
-			sendResponse("NoTabId"); // signal that the extension must be opened in a tab
-		}
-
-		if (message.type === "getTabNode") {
-			const tabNode = tabTree.find((node) => node.tabId === sender?.tab?.id);
-			sendResponse(tabNode);
-		}
-
-		if (message.type === "getTabTree") {
-			sendResponse(tabTree);
-		}
-	},
-);
