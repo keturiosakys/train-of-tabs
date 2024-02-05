@@ -17,7 +17,7 @@ body {
 	}
 
 	p {
-		@apply text-gray-800 dark:text-gray-400 font-medium;
+		@apply text-gray-800 dark:text-gray-100 font-medium;
 	}
 }
 

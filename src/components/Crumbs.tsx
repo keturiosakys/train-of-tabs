@@ -13,7 +13,6 @@ import { createShortcut } from "@solid-primitives/keyboard";
 import { createActiveElement } from "@solid-primitives/active-element";
 
 async function getNode(tab: chrome.tabs.Tab) {
-	//debugger;
 	const tree = tabTree();
 	const id = tab.id;
 
@@ -23,6 +22,7 @@ async function getNode(tab: chrome.tabs.Tab) {
 
 	return tree.get(id);
 }
+export const [updated, setUpdated] = createSignal<boolean>(false);
 
 export default function Crumbs() {
 	const [currentTab] = createResource(getCurrentTab);
@@ -49,6 +49,7 @@ export default function Crumbs() {
 	});
 
 	createEffect(async () => {
+		updated();
 		if (tabNode()) {
 			setOpened(tabNode()?.children || []);
 			chrome.tabs.get(tabNode()?.originTabId as number, async (tab) =>
