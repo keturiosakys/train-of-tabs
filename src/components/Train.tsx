@@ -74,12 +74,12 @@ export default function Train() {
 					</section>
 
 					<section>
-						<ul class="flex flex-col space-y-2 py-2">
+						<ul class="flex flex-col space-y-2 pt-2">
 							<CurrentTab tab={currentTabNode()} />
 						</ul>
 					</section>
 
-					<section class="flex flex-col justify-center">
+					<section class={`flex flex-col justify-center pt-2`}>
 						<Show when={opened().length > 0}>
 							<ul class="flex flex-col space-y-2">
 								<For each={opened()}>
