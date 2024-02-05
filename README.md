@@ -2,13 +2,13 @@
 
 <h1>Train of Tabs</h1>
 
-<img height="280" src="./assets/cover.png" alt="a smiling train carrying browser tabs"/>
+<img height="280" src="./assets/cover_no_bg.png" alt="a smiling train carrying browser tabs"/>
 
 <p><i>"Best thing since breadcrumbs"</i></p>
 
 </div>
 
-Track your train of ~thought~ tabs.
+Track your train of ~thought~ tabs on the internet.
 
 A scenario:
 1. You open a whole bunch of tabs
