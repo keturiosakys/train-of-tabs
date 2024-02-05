@@ -8,6 +8,9 @@
 
 </div>
 
+> **Note:**
+> Currently works only in Chromium based browsers
+
 Track your train of ~thought~ tabs on the internet.
 
 A scenario:
@@ -20,5 +23,3 @@ This is a simple extension that helps with these questions. It keeps track of wh
 - the origin tab (that spawned this current tab)
 - the descendant tabs that this current tab opened
 
-> **Note:**
-> Currently works only in Chrome (and Chromium based browsers)
