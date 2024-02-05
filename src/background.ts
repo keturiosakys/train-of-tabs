@@ -4,77 +4,77 @@ import { mapToObject } from "./utils";
 export const tabTree: Map<number, TabNode> = new Map();
 
 function createTabNode(tab: chrome.tabs.Tab): TabNode | undefined {
-	if (!tab.id) {
-		return undefined;
-	}
+  if (!tab.id) {
+    return undefined;
+  }
 
-	return {
-		tabId: tab.id,
-		url: tab.url || "",
-		title: tab.title || "",
-		originTabId: tab.openerTabId,
-		status: "open",
-		children: [],
-	};
+  return {
+    tabId: tab.id,
+    url: tab.url || "",
+    title: tab.title || "",
+    favicon: tab.favIconUrl || "",
+    originTabId: tab.openerTabId,
+    status: "open",
+    children: [],
+  };
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-	console.log("Panko extension installed. Crushing bread now...");
+  console.log("Train o'tabs extension installed. Choo choo...");
 });
 
 chrome.tabs.onCreated.addListener(async (tab) => {
-	if (!tab.id) {
-		return; // no id no fun
-	}
+  if (!tab.id) {
+    return; // no id no fun
+  }
 
-	const createdTabNode: TabNode = {
-		tabId: tab.id,
-		url: tab.url || "",
-		title: tab.title || "",
-		originTabId: tab.openerTabId,
-		status: "open",
-	};
+  const createdTabNode: TabNode = {
+    tabId: tab.id,
+    url: tab.url || "",
+		favicon: tab.favIconUrl || "",
+    title: tab.title || "",
+    originTabId: tab.openerTabId,
+    status: "open",
+  };
 
-	tabTree.set(tab.id, createdTabNode);
+  tabTree.set(tab.id, createdTabNode);
 
-	if (tab.openerTabId) {
-		const originTabNode =
-			tabTree.get(tab.openerTabId) ??
-			(createTabNode(await chrome.tabs.get(tab.openerTabId)) as TabNode);
+  if (tab.openerTabId) {
+    const originTabNode =
+      tabTree.get(tab.openerTabId) ??
+      (createTabNode(await chrome.tabs.get(tab.openerTabId)) as TabNode);
 
-		if (!originTabNode.children) {
-			originTabNode.children = [];
-		}
+    if (!originTabNode.children) {
+      originTabNode.children = [];
+    }
 
-		originTabNode.children.push(createdTabNode);
-		tabTree.set(tab.openerTabId, originTabNode);
-	}
+    originTabNode.children.push(createdTabNode);
+    tabTree.set(tab.openerTabId, originTabNode);
+  }
 
-	chrome.storage.session.set({ tabTree: mapToObject(tabTree) });
+  chrome.storage.session.set({ tabTree: mapToObject(tabTree) });
 });
 
 chrome.tabs.onUpdated.addListener(async (tabId, _changeInfo, tab) => {
-	const tabNode = tabTree.get(tabId);
+  const tabNode = tabTree.get(tabId);
 
-	if (tabNode) {
-		tabNode.url = tab.url || "";
-		tabNode.title = tab.title || "";
-		tabNode.originTabId = tab.openerTabId;
-		tabTree.set(tabId, tabNode);
-	}
+  if (tabNode) {
+    tabNode.url = tab.url || "";
+    tabNode.title = tab.title || "";
+		tabNode.favicon = tab.favIconUrl || "";
+    tabNode.originTabId = tab.openerTabId;
+    tabTree.set(tabId, tabNode);
+  }
 
-	chrome.storage.session.set({ tabTree: mapToObject(tabTree) });
+  chrome.storage.session.set({ tabTree: mapToObject(tabTree) });
 });
 
-//chrome.tabs.onUpdated.addListener(async (_tabId, changeInfo) => {
-//});
-
 chrome.tabs.onRemoved.addListener((tabId) => {
-	const tabNode = tabTree.get(tabId);
+  const tabNode = tabTree.get(tabId);
 
-	if (tabNode) {
-		tabNode.status = "closed";
-		tabTree.set(tabId, tabNode);
-		chrome.storage.session.set({ tabTree: mapToObject(tabTree) });
-	}
+  if (tabNode) {
+    tabNode.status = "closed";
+    tabTree.set(tabId, tabNode);
+    chrome.storage.session.set({ tabTree: mapToObject(tabTree) });
+  }
 });
