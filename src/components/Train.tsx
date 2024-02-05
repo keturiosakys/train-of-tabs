@@ -8,7 +8,7 @@ import {
 import { tabTree } from "../App";
 import { TabNode } from "../types";
 import { getCurrentTab } from "../utils";
-import { Tab } from "./Tab";
+import { Tab, CurrentTab } from "./Tab";
 import { createShortcut } from "@solid-primitives/keyboard";
 import { createActiveElement } from "@solid-primitives/active-element";
 
@@ -24,9 +24,9 @@ async function getNode(tab: chrome.tabs.Tab) {
 }
 export const [updated, setUpdated] = createSignal<boolean>(false);
 
-export default function Crumbs() {
+export default function Train() {
 	const [currentTab] = createResource(getCurrentTab);
-	const [tabNode] = createResource(currentTab, getNode);
+	const [currentTabNode] = createResource(currentTab, getNode);
 	const [opened, setOpened] = createSignal<TabNode[]>([]);
 	const [origin, setOrigin] = createSignal<TabNode>();
 
@@ -50,42 +50,42 @@ export default function Crumbs() {
 
 	createEffect(async () => {
 		updated();
-		if (tabNode()) {
-			setOpened(tabNode()?.children || []);
-			chrome.tabs.get(tabNode()?.originTabId as number, async (tab) =>
+		if (currentTabNode()) {
+			setOpened(currentTabNode()?.children || []);
+			chrome.tabs.get(currentTabNode()?.originTabId as number, async (tab) =>
 				setOrigin((await getNode(tab)) as TabNode),
 			);
 		}
 	});
 
+
 	return (
 		<div class="w-64 p-2">
-			<Show when={currentTab()} fallback={<p>Loading...</p>}>
+			<Show when={currentTabNode()} fallback={<p>Loading...</p>}>
 				<Show
-					when={opened().length > 0 || origin()}
-					fallback={<p>Open some tabs to see something here...</p>}
+					when={opened().length > 0 || origin() || currentTabNode()}
 				>
-					<section class="flex flex-col justify-start">
+					<section class="flex flex-col justify-center">
 						<Show when={origin()}>
-							<p class="pb-2 font-bold">This tab opened from:</p>
 							<ul class="flex flex-col space-y-2">
-								<Tab tab={origin()} symbol="←" />
+								<Tab tab={origin()} />
 							</ul>
 						</Show>
 					</section>
 
-					<Show when={opened().length > 0 && origin()}>
-						<hr class="border-gray-300 my-4 mx-1" />
-					</Show>
+					<section>
+						<ul class="flex flex-col space-y-2 py-2">
+							<CurrentTab tab={currentTabNode()} />
+						</ul>
+					</section>
 
-					<section class="flex flex-col justify-start">
+					<section class="flex flex-col justify-center">
 						<Show when={opened().length > 0}>
-							<p class="pb-2 font-bold">Tabs opened from here:</p>
 							<ul class="flex flex-col space-y-2">
 								<For each={opened()}>
 									{(tab) => {
 										if (tab.status === "open")
-											return <Tab tab={tab} symbol="→" />;
+											return <Tab tab={tab} />;
 									}}
 								</For>
 							</ul>

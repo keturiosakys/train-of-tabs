@@ -14,7 +14,7 @@ const manifest = defineManifest(async (env) => ({
 		48: "src/assets/icon48.png",
 		128: "src/assets/icon128.png",
 	},
-	name: env.mode === "development" ? "[DEV] Panko" : "Panko",
+	name: env.mode === "development" ? "[DEV] Train of Tabs" : "Train of Tabs",
 	action: {
 		default_popup: "index.html",
 		default_title: "Panko",
