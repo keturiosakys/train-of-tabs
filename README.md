@@ -1,10 +1,12 @@
+<div align="center">
 
+<h1>Train of Tabs</h1>
 
-<h1 align="center">Train of Tabs</h1>
+<img height="280" src="./assets/cover.png" alt="a smiling train carrying browser tabs"/>
 
-<img src="./assets/cover.png" alt="a smiling train carrying browser tabs"/>
+<p><i>"Best thing since breadcrumbs"</i></p>
 
-<p align="center"><i>"Best thing since breadcrumbs"</i></p>
+</div>
 
 Track your train of ~thought~ tabs.
 
