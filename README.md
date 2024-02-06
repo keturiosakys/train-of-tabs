@@ -14,12 +14,15 @@
 Track your train of ~thought~ tabs on the internet.
 
 A scenario:
+
 1. You open a whole bunch of tabs
 2. You switch to something else (another application or you go make some tea)
 3. You come back to the browser and wonder: what was I intending to do? Where did this tab come from? Which tabs are the links I was gonna follow up from here?
 
-This is a simple extension that helps with these questions. It keeps track of which links you opened from which tabs. However, instead of showing you a deeply nested hierarchical tab tree that is hard to navigate, you're given a very simple interface where you're shown at most 3 type of items:
-- the current tab
-- the origin tab (that spawned this current tab)
-- the descendant tabs that this current tab opened
+This is a simple extension that helps with these questions. It keeps track of which tabs you opened from which other tabs and, if called up, at any given tab it will show you that information.
 
+### Alternatives
+
+#### Tree-style tabs
+
+There are a number of great tree-style tab plugins out there that look to address a similar problem. They will generally show you a full nested tree of your tabs. However, I found this to be quite noisy - you're always looking at the entire tree of your tabs. In a long browsing/research session this can get especially unwieldy as your tree branches off to the deep ends of the internet.
