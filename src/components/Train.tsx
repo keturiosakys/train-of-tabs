@@ -1,26 +1,27 @@
+import { createActiveElement } from "@solid-primitives/active-element";
+import { createShortcut } from "@solid-primitives/keyboard";
 import {
+	For,
+	Show,
 	createEffect,
 	createResource,
 	createSignal,
-	For,
-	Show,
 } from "solid-js";
 import { tabTree } from "../App";
 import { TabNode } from "../types";
 import { getCurrentTab } from "../utils";
-import { Tab, CurrentTab } from "./Tab";
-import { createShortcut } from "@solid-primitives/keyboard";
-import { createActiveElement } from "@solid-primitives/active-element";
+import { CurrentTab, Tab } from "./Tab";
 
-async function getNode(tab: chrome.tabs.Tab) {
+async function getNode(
+	tab: chrome.tabs.Tab | undefined,
+): Promise<TabNode | undefined> {
 	const tree = tabTree();
-	const id = tab.id;
 
-	if (!id) {
+	if (!tab || !tab.id) {
 		return;
 	}
 
-	return tree.get(id);
+	return tree.get(tab?.id);
 }
 export const [updated, setUpdated] = createSignal<boolean>(false);
 
@@ -52,26 +53,34 @@ export default function Train() {
 		updated();
 		if (currentTabNode()) {
 			setOpened(currentTabNode()?.children || []);
-			chrome.tabs.get(currentTabNode()?.originTabId as number, async (tab) =>
-				setOrigin((await getNode(tab)) as TabNode),
-			);
+
+			if (!currentTabNode()?.originTabId) {
+				setOrigin(undefined);
+				return;
+			}
+
+			try {
+				const origin = await chrome.tabs.get(
+					currentTabNode()?.originTabId as number,
+				);
+				setOrigin(await getNode(origin));
+			} catch (_err) {
+				setOrigin(undefined);
+			}
 		}
 	});
 
-
 	return (
 		<div class="w-64 p-2">
-			<Show when={currentTabNode()} fallback={<p>Loading...</p>}>
-				<Show
-					when={opened().length > 0 || origin() || currentTabNode()}
-				>
-					<section class="flex flex-col justify-center">
-						<Show when={origin()}>
+			<Show when={currentTab()} fallback={<p>Loading...</p>}>
+				<Show when={opened().length > 0 || origin() || currentTabNode()}>
+					<Show when={origin()}>
+						<section class="flex flex-col justify-center">
 							<ul class="flex flex-col space-y-2">
 								<Tab tab={origin()} />
 							</ul>
-						</Show>
-					</section>
+						</section>
+					</Show>
 
 					<section>
 						<ul class="flex flex-col space-y-2 pt-2">
@@ -79,18 +88,17 @@ export default function Train() {
 						</ul>
 					</section>
 
-					<section class={`flex flex-col justify-center pt-2`}>
-						<Show when={opened().length > 0}>
+					<Show when={opened().length > 0}>
+						<section class={"flex flex-col justify-center pt-2"}>
 							<ul class="flex flex-col space-y-2">
 								<For each={opened()}>
 									{(tab) => {
-										if (tab.status === "open")
-											return <Tab tab={tab} />;
+										if (tab.status === "open") return <Tab tab={tab} />;
 									}}
 								</For>
 							</ul>
-						</Show>
-					</section>
+						</section>
+					</Show>
 				</Show>
 			</Show>
 		</div>
